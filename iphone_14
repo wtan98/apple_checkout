@@ -1,0 +1,140 @@
+const puppeteer = require('puppeteer-extra');
+const StealthPlugin = require ('puppeteer-extra-plugin-stealth');
+puppeteer.use(StealthPlugin());
+
+
+const firstName = 'REPLACE-WITH-YOUR-INFO';
+const lastName = 'REPLACE-WITH-YOUR-INFO';
+const street = 'REPLACE-WITH-YOUR-INFO';
+const zipCode = 'REPLACE-WITH-YOUR-INFO';
+const email = 'REPLACE-WITH-YOUR-INFO';
+const phone = 'REPLACE-WITH-YOUR-INFO'
+const cardNumber = 'REPLACE-WITH-YOUR-INFO'
+const monthForwardSlashDate = 'REPLACE-WITH-YOUR-INFO-LIKE-04/20';
+const cvv = 'REPLACE-WITH-YOUR-INFO';
+
+
+async function launchBrowser(){
+    const browser = await puppeteer.launch({headless: false})
+    const page = await browser.newPage();
+    return [browser, page];
+}
+
+
+async function addToCart(page){
+    await page.waitForTimeout(500);
+    await page.evaluate(() => document.querySelector("input[value='6_7inch']").click());
+    await page.waitForTimeout(500);
+
+
+    await page.evaluate(() => document.querySelector("input[value='bluetitanium']").click());
+    await page.waitForTimeout(500);
+
+
+    await page.evaluate(() => document.querySelector("input[value='256gb']").click());
+    await page.waitForTimeout(500);
+
+
+    await page.evaluate(() => document.querySelector("input[value='noTradeIn']").click());
+    await page.waitForTimeout(500);
+   
+    await page.evaluate(() => document.querySelector("input[value='fullprice']").click());
+    await page.waitForTimeout(500);
+
+
+    await page.evaluate(() => document.querySelector("input[value='UNLOCKED/US']").click());
+    await page.waitForTimeout(500);
+
+
+    await page.evaluate(() => document.querySelector("input[id='applecareplus_59_noapplecare']").click());
+    await page.waitForTimeout(500);
+
+
+    await page.evaluate(() => document.querySelector("button[name='add-to-cart']").click());
+    await page.waitForTimeout(2000);
+
+
+    await page.evaluate(() => document.querySelector("button[value='proceed']").click());
+    await page.waitForTimeout(2000);
+
+
+    await page.evaluate(() => document.querySelector("button[id='shoppingCart.actions.navCheckout']").click());
+    await page.waitForTimeout(2000);
+
+
+    await page.evaluate(() => document.querySelector("button[id='signIn.guestLogin.guestLogin']").click());
+    await page.waitForTimeout(2000);
+
+
+    await page.evaluate(() => document.querySelector("button[id='rs-checkout-continue-button-bottom']").click());
+    await page.waitForTimeout(2000);
+}
+
+
+async function delivery(page){
+    await page.type("input[name='firstName']", firstName);
+    await page.waitForTimeout(2000);
+    await page.type("input[name='lastName']", lastName);
+    await page.waitForTimeout(2000);
+    await page.type("input[name='street']", street);
+    await page.waitForTimeout(2000);
+
+
+    await await page.$("input[name='postalCode']").click({clickCount:3});
+    await await page.$("input[name='postalCode']").type(postalCode);
+
+
+    await page.waitForTimeout(2000);
+    await page.type("input[name='emailAddress']", email);
+    await page.waitForTimeout(1000);
+    await page.type("input[name='fullDaytimePhone']", phone);
+    await page.waitForTimeout(1000);
+    await page.evaluate(() => document.querySelector("button[id='rs-checkout-continue-button-bottom']").click());
+}
+
+
+async function payment(page){
+    await page.waitForTimeout(2000);
+    await page.evaluate(() => document.querySelector("input[name='checkout.billing.billingOptions.selectBillingOption']").click());
+    await page.waitForTimeout(2000);
+
+
+
+
+    let selector = "input[id='checkout.billing.billingOptions.selectedBillingOptions.creditCard.cardInputs.cardInput-0.cardNumber']";
+    await page.type(selector, cardNumber);
+    await page.waitForTimeout(2000);
+
+
+
+
+    selector = "input[id='checkout.billing.billingOptions.selectedBillingOptions.creditCard.cardInputs.cardInput-0.expiration']";
+    await page.type(selector, monthForwardSlashDate);
+    await page.waitForTimeout(2000);
+
+
+    selector = "input[id='checkout.billing.billingOptions.selectedBillingOptions.creditCard.cardInputs.cardInput-0.securityCode']";
+    await page.type(selector, cvv);
+    await page.waitForTimeout(2000);
+
+
+    await page.waitForSelector("button[id='rs-checkout-continue-button-bottom']")
+    await page.evaluate(() => document.querySelector("button[id='rs-checkout-continue-button-bottom']").click());
+    await page.waitForTimeout(2000);
+
+
+    await page.evaluate(() => document.querySelector("button[id='rs-checkout-continue-button-bottom']").click());
+}
+
+
+async function runScript(){
+    var browserAndPage = await launchBrowser();
+    var page = browserAndPage[1];
+    await page.goto('https://www.apple.com/shop/buy-iphone/iphone-15-pro', {waitUntil: 'networkidle0'});
+    await addToCart(page);
+    await delivery(page);
+    await payment(page);
+}
+
+
+runScript();
